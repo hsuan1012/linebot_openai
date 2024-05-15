@@ -12,7 +12,6 @@ import time
 
 # Initialize Flask app
 app = Flask(__name__)
-static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
 # Initialize LINE API
 line_bot_api = LineBotApi(os.getenv('CHANNEL_ACCESS_TOKEN'))
@@ -23,13 +22,15 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # Selenium setup
 options = webdriver.ChromeOptions()
-service = ChromeService(executable_path="chromedriver.exe")
+options.add_argument("--headless")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+service = ChromeService(executable_path="/usr/local/bin/chromedriver")
 driver = webdriver.Chrome(service=service, options=options)
 
 def scrape_transit_info():
     try:
         driver.get("https://transit.navitime.com/zh-tw/tw/transfer?start=00016389&goal=00022583") 
-        driver.maximize_window()
         driver.refresh()
         time.sleep(3) 
 
@@ -81,7 +82,7 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     msg = event.message.text
-    if "捷運" in msg:
+    if "交通" in msg:
         transit_info = scrape_transit_info()
         line_bot_api.reply_message(event.reply_token, TextSendMessage(transit_info))
     else:
@@ -96,7 +97,12 @@ def handle_message(event):
 # Handle postback events
 @handler.add(PostbackEvent)
 def handle_postback(event):
-    print(event.postback.data)
+    data = event.postback.data
+    if data == "交通":
+        transit_info = scrape_transit_info()
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(transit_info))
+    else:
+        line_bot_api.reply_message(event.reply_token, TextSendMessage("未知的 postback 事件"))
 
 # Welcome new members
 @handler.add(MemberJoinedEvent)
