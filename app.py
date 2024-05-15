@@ -17,8 +17,6 @@ app = Flask(__name__)
 line_bot_api = LineBotApi(os.getenv('tsGykdGQN1KnwwQWwkkmq7JM0ji0RnYXFa0DBN3sfLVJ4wgcXudGmWpUZst3ZDBHXCL7xp2NhVrR1eDJKdExozjb6DInsSdHeSw1rtrjmz9Bi3Tx/YiI1g4/yGU95a0Jg15MyGM9QFCNdrM2SfU+XQdB04t89/1O/w1cDnyilFU='))
 handler = WebhookHandler(os.getenv('0584d0fc476d78024afcd7cbbf8096b4'))
 
-# Initialize OpenAI API
-openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # Selenium setup
 options = webdriver.ChromeOptions()
